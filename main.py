@@ -13,28 +13,26 @@ would make sense to bound the values to roughly that range.
 My monitors each have a 16:9 aspect ratio and 2560x1440 pixels.
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
-
-def check(c_number):
+def check(c_number, depth):
     """
     The return value of this function tells us if the point is
     cointained in the mandelbrot set.
     """
     z = 0
-    for i in range(1000):
+    for i in range(depth):
         z = f_c(z, c_number)
         #the 1000*c_number is an arbitrary limit i made up, seems to work
         if(abs(z) > 1000*abs(c_number)):
-            print("This number diverges")
             return False
-    print("This number does not diverge")
     return True
 
-def calculate(c_number, iterations):
-    z = 0
-    for i in range(iterations):
-        z = f_c(z,c_number)
-    return z
+# def calculate(c_number, iterations):
+#     z = 0
+#     for i in range(iterations):
+#         z = f_c(z,c_number)
+#     return z
 
 def f_c(z,c_number):
     return z**2 + c_number
