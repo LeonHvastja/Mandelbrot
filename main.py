@@ -3,57 +3,40 @@
 """
 Project goal: make a script that generates mandelbrot set images
 
-Goals:
-1.Make code that uses the math to generate a single point value
-...
-2.Generate a set of complex numbers to run through the calculations
-The mandelbrot set occurs roughly from x = [-2,0.5] and y = [-1, 1] so it
-would make sense to bound the values to roughly that range.
-
 My monitors each have a 16:9 aspect ratio and 2560x1440 pixels.
+
+Originally written in jupyter notebook.
 """
 import numpy as np
-import matplotlib.pyplot as plt
+from mandelbrot import *
+from PIL import Image
 
-def check(c_number, depth):
-    """
-    The return value of this function tells us if the point is
-    cointained in the mandelbrot set.
-    """
-    z = 0
-    for i in range(depth):
-        z = f_c(z, c_number)
-        #the 1000*c_number is an arbitrary limit i made up, seems to work
-        if(abs(z) > 1000*abs(c_number)):
-            return False
-    return True
+# Derived from a 16:9 aspect ratio monitor
+x_ratio = 16
+y_ratio = 9
+# dpi setting 120 is for HD, 160 is for QHD, 240 is 4k etc.
+k = 160
+# how many iterations to check for divergence, 70+ seems optimal
+depth = 100
 
-# def calculate(c_number, iterations):
-#     z = 0
-#     for i in range(iterations):
-#         z = f_c(z,c_number)
-#     return z
 
-def f_c(z,c_number):
-    return z**2 + c_number
+def main():
+    x = np.linspace(-2.5, 1.5, x_ratio*k)
+    y = np.linspace(-9/8, 9/8, y_ratio*k)
 
-# this function should return a list of complex numbers to run through
-# based on something like pixel count or similar
-def numbers(x_aspect, y_aspect, k):
-    """
-    k is the factor we multiply the two aspect ratios to get total pixel
-    count, it thus serves as a sort of scaling factor
-    the native k for my monitors is 160
-    """
-    lower_x_bound = -2.5
-    upper_x_bound = 1.5
-    lower_y_bound = -9/8
-    upper_y_bound = 9/8
-    # the multiplication by 4 is to convert x and y coordinates
-    # to aspect ratio "units"
-    x_resolution = x_aspect*k
-    y_resolution = y_aspect*k
-    x_values = np.linspace(lower_x_bound, upper_x_bound, x_resolution)
-    y_values = np.linspace(lower_y_bound, upper_y_bound, y_resolution)
-    #list comprehension to generate all of our points
-    all_values =  [complex(x,y) for x in x_values for y in y_values]
+    points = np.asarray([complex(x_,y_) for x_ in x for y_ in y])
+
+    # this is the cpu heavy part, might want to try using mutliple threads
+    # in future versions
+    points_checked = [mandelbrotCheck(z,depth,1000) for z in points]
+
+    checked = np.asarray(points_checked)
+    checked = checked.reshape(x_ratio*k,y_ratio*k)
+
+    my_image = Image.fromarray(checked)
+    name = f"Mandelbrot_{x_ratio*k}x{y_ratio*k}_depth{depth}.png"
+    my_image.save(name)
+
+
+if __name__ == __main__:
+    main()
