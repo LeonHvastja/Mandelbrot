@@ -38,5 +38,5 @@ def main():
     my_image.save(name)
 
 
-if __name__ == __main__:
+if __name__ == "__main__":
     main()
