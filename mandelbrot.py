@@ -1,12 +1,12 @@
 #mandelbrot.py
+import numpy as np
 
 def rec(z, c):
-    return z**2 + c
+    return np.square(z) + c
 
-def mandelbrotCheck(c, depth = 100, threshold = 1000):
-    z = 0
-    for i in range(depth):
-        z = rec(z, c)
-        if(abs(z) > threshold*abs(c)):
-            return False
-    return True
+def divergence_check(points, divergence, iteration):
+    diverge_indicator = np.where(np.absolute(points) > 1000, 1, 0)
+    not_diverge = (diverge_indicator - 1)*(-1)
+    
+    
+    return (points*not_diverge, divergence + diverge_indicator*iteration)
